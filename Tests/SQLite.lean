@@ -1,9 +1,9 @@
-import Sqlite
 import LSpec
+import SQLite
 
 open LSpec
-open Sqlite.FFI
-open Sqlite.FFI.Constants
+open SQLite.FFI
+open SQLite.FFI.Constants
 
 instance (b : Bool) : Testable b :=
   if h : b = true then

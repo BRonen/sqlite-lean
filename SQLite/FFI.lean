@@ -1,4 +1,4 @@
-namespace Sqlite.FFI
+namespace SQLite.FFI
 namespace Constants
 
 def SQLITE_CONFIG_SINGLETHREAD        : UInt32 := 1
@@ -97,6 +97,14 @@ private opaque cursorBindText : @&RawCursor → UInt32 → String → IO Unit
 @[extern "lean_sqlite_cursor_bind_int"]
 private opaque cursorBindInt : @&RawCursor → UInt32 → Int32 → IO Unit
 
+@[extern "lean_sqlite_cursor_bind_int64"]
+private opaque cursorBindInt64 : @&RawCursor → UInt32 → Int64 → IO Unit
+
+@[extern "lean_sqlite_cursor_bind_double"]
+private opaque cursorBindDouble : @&RawCursor → UInt32 → Float → IO Unit
+
+-- TODO: Support binding ByteArrays
+
 @[extern "lean_sqlite_cursor_bind_parameter_name"]
 private opaque cursorBindParameterName : @&RawCursor → Int32 → String → IO Unit
 
@@ -115,6 +123,12 @@ private opaque cursorColumnText : @&RawCursor → UInt32 → IO String
 @[extern "lean_sqlite_cursor_column_int"]
 private opaque cursorColumnInt : @&RawCursor → UInt32 → IO Int32
 
+@[extern "lean_sqlite_cursor_column_int64"]
+private opaque cursorColumnInt64 : @&RawCursor → UInt32 → IO Int64
+
+@[extern "lean_sqlite_cursor_column_double"]
+private opaque cursorColumnDouble : @&RawCursor → UInt32 → IO Float
+
 @[extern "lean_sqlite_cursor_explain"]
 private opaque cursorExplain : @&RawCursor → UInt32 → IO Int
 
@@ -125,7 +139,7 @@ opaque sqliteThreadsafe : IO Int
 opaque sqliteConfig : UInt32 → IO Unit
 
 private def sqlitePrepareWrap (conn : RawConn) (query : String) : IO (Except String Cursor) := do
-  pure $ match ← sqlitePrepare conn query with
+  return match ← sqlitePrepare conn query with
   | Except.ok c => pure { cursor := c,
                           step := cursorStep c,
                           bindText := cursorBindText c,
@@ -139,8 +153,8 @@ private def sqlitePrepareWrap (conn : RawConn) (query : String) : IO (Except Str
 
 def connect (s : String) (flags : UInt32) : IO Connection := do
   let rawconn ← sqliteOpen s flags
-  pure { path := s,
-         conn := rawconn,
-         prepare := (sqlitePrepareWrap rawconn ·) }
+  return { path := s,
+           conn := rawconn,
+           prepare := (sqlitePrepareWrap rawconn ·) }
 
-end Sqlite.FFI
+end SQLite.FFI
