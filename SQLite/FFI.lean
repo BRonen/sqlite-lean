@@ -139,7 +139,7 @@ opaque sqliteThreadsafe : IO Int
 opaque sqliteConfig : UInt32 → IO Unit
 
 private def sqlitePrepareWrap (conn : RawConn) (query : String) : IO (Except String Cursor) := do
-  pure $ match ← sqlitePrepare conn query with
+  return match ← sqlitePrepare conn query with
   | Except.ok c => pure { cursor := c,
                           step := cursorStep c,
                           bindText := cursorBindText c,
@@ -153,8 +153,8 @@ private def sqlitePrepareWrap (conn : RawConn) (query : String) : IO (Except Str
 
 def connect (s : String) (flags : UInt32) : IO Connection := do
   let rawconn ← sqliteOpen s flags
-  pure { path := s,
-         conn := rawconn,
-         prepare := (sqlitePrepareWrap rawconn ·) }
+  return { path := s,
+           conn := rawconn,
+           prepare := (sqlitePrepareWrap rawconn ·) }
 
 end SQLite.FFI
