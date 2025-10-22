@@ -1,5 +1,5 @@
-import SQLite
 import LSpec
+import SQLite
 
 open LSpec
 open SQLite.FFI

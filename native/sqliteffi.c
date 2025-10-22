@@ -114,6 +114,32 @@ lean_obj_res lean_sqlite_cursor_bind_int(b_lean_obj_arg cursor_box, uint32_t col
   return lean_io_result_mk_ok(lean_box(0));
 }
 
+lean_obj_res lean_sqlite_cursor_bind_int64(b_lean_obj_arg cursor_box, uint32_t col, int64_t value) {
+  sqlite3_stmt* cursor = unbox_cursor(cursor_box);
+
+  const int64_t c = sqlite3_bind_int64(cursor, col, value);
+
+  if (c != SQLITE_OK) {
+    lean_object* err = lean_mk_string(sqlite3_errmsg(sqlite3_db_handle(cursor)));
+    return lean_io_result_mk_error(lean_mk_io_error_other_error(c, err));
+  }
+
+  return lean_io_result_mk_ok(lean_box(0));
+}
+
+lean_obj_res lean_sqlite_cursor_bind_double(b_lean_obj_arg cursor_box, uint32_t col, double value) {
+  sqlite3_stmt* cursor = unbox_cursor(cursor_box);
+
+  const double c = sqlite3_bind_double(cursor, col, value);
+
+  if (c != SQLITE_OK) {
+    lean_object* err = lean_mk_string(sqlite3_errmsg(sqlite3_db_handle(cursor)));
+    return lean_io_result_mk_error(lean_mk_io_error_other_error(c, err));
+  }
+
+  return lean_io_result_mk_ok(lean_box(0));
+}
+
 lean_obj_res lean_sqlite_cursor_bind_parameter_name(b_lean_obj_arg cursor_box, int32_t value) {
   sqlite3_stmt* cursor = unbox_cursor(cursor_box);
 
@@ -135,9 +161,26 @@ lean_obj_res lean_sqlite_cursor_column_text(b_lean_obj_arg cursor_box, uint32_t 
 lean_obj_res lean_sqlite_cursor_column_int(b_lean_obj_arg cursor_box, uint32_t col) {
   sqlite3_stmt* cursor = unbox_cursor(cursor_box);
 
-  const int32_t integer = sqlite3_column_int(cursor, col);
+  const int32_t value = sqlite3_column_int(cursor, col);
 
-  return lean_io_result_mk_ok(lean_box(integer));
+  /* TODO: int32's do not need to be boxe */
+  return lean_io_result_mk_ok(lean_box(value));
+}
+
+lean_obj_res lean_sqlite_cursor_column_int64(b_lean_obj_arg cursor_box, uint32_t col) {
+  sqlite3_stmt* cursor = unbox_cursor(cursor_box);
+
+  const int64_t value = sqlite3_column_int64(cursor, col);
+
+  return lean_io_result_mk_ok(lean_box(value));
+}
+
+lean_obj_res lean_sqlite_cursor_column_double(b_lean_obj_arg cursor_box, uint32_t col) {
+  sqlite3_stmt* cursor = unbox_cursor(cursor_box);
+
+  const double value = sqlite3_column_double(cursor, col);
+
+  return lean_io_result_mk_ok(lean_box(value));
 }
 
 lean_obj_res lean_sqlite_cursor_step(b_lean_obj_arg cursor_box) {
