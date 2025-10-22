@@ -8,7 +8,7 @@ lean_lib SQLite
 def compiler := (·.getD "cc") <$> IO.getEnv "CC"
 
 target sqlite.o pkg : FilePath := do
-  let oFile := pkg.dir / "native" / "sqlite3.o"
+  let oFile := pkg.buildDir / "sqlite3.o"
   let srcJob ← inputTextFile <| pkg.dir / "native" / "sqlite3.c"
   let sqliteHeaders := pkg.dir / "native"
   -- Ensure that both sqlite3.h and sqlite3ext.h are available during compilation
@@ -16,7 +16,7 @@ target sqlite.o pkg : FilePath := do
   buildO oFile srcJob weakArgs #["-fPIC"] (← compiler) getLeanTrace
 
 target sqliteffi.o pkg : FilePath := do
-  let oFile := pkg.dir / "native" / "sqliteffi.o"
+  let oFile := pkg.buildDir  / "sqliteffi.o"
   let srcJob ← inputTextFile <| pkg.dir / "native" / "sqliteffi.c"
   let sqliteHeaders := pkg.dir / "native"
   let weakArgs := #["-I", (← getLeanIncludeDir).toString, "-I", sqliteHeaders.toString]
