@@ -26,15 +26,11 @@ sqlite3_stmt* unbox_cursor(lean_object* o) {
 void connection_finalize(void* conn) {
   if (!conn) return;
 
-  printf("connection_finalize: %x\n", conn);
-
   sqlite3_close(conn);
 }
 
 void cursor_finalize(void* cursor) {
   if (!cursor) return;
-
-  printf("cursor_finalize: %x\n", cursor);
 
   sqlite3_finalize(cursor);
 }
@@ -48,8 +44,6 @@ lean_obj_res lean_sqlite_initialize() {
 lean_obj_res lean_sqlite_open(b_lean_obj_arg path, uint32_t flags) {
   const char* path_str = lean_string_cstr(path);
   sqlite3* conn = malloc(sizeof(sqlite3*));
-
-  printf("initialize_connection: %x\n", conn);
 
   int32_t c = sqlite3_open_v2(path_str, &conn, flags, NULL);
 
@@ -68,8 +62,6 @@ lean_obj_res lean_sqlite_prepare(b_lean_obj_arg conn_box, b_lean_obj_arg query_s
   const char* query = lean_string_cstr(query_str);
 
   sqlite3_stmt* cursor = malloc(sizeof(sqlite3_stmt*));
-
-  printf("initialize_cursor: %x\n", cursor);
 
   int32_t c = sqlite3_prepare_v2(conn, query, -1, &cursor, NULL);
 
