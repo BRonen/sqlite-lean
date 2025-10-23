@@ -162,8 +162,8 @@ lean_obj_res lean_sqlite_cursor_column_int64(b_lean_obj_arg cursor_box, uint32_t
 
   const int64_t value = sqlite3_column_int64(cursor, col);
 
-  // This is a bit sketchy but it seems to work
-  // There's no lean_box_int64
+  // There's no lean_box_int64 but this seems to work
+  // https://github.com/leanprover/lean4/issues/10561
   return lean_io_result_mk_ok(lean_box_uint64(value));
 }
 
