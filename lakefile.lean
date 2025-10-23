@@ -32,12 +32,13 @@ extern_lib libsqlite pkg := do
 lean_exe sqlite where
   root := `Main
   moreLinkObjs := #[libsqlite]
-  moreLinkArgs := #["-Wl,--unresolved-symbols=ignore-all"] -- TODO: Very gross hack
+  moreLinkArgs := if !Platform.isWindows then #["-Wl,--unresolved-symbols=ignore-all"] else #[] -- TODO: Very gross hack
 
 @[test_driver]
 lean_exe Tests.SQLite where
+  buildType := .debug
   moreLinkObjs := #[libsqlite]
-  moreLinkArgs := #["-Wl,--unresolved-symbols=ignore-all"] -- Same as above
+  moreLinkArgs := if !Platform.isWindows then #["-Wl,--unresolved-symbols=ignore-all"] else #[] -- Same as above
 
 require LSpec from git
   "https://github.com/argumentcomputer/lspec/" @ "1fc461a9b83eeb68da34df72cec2ef1994e906cb"

@@ -17,10 +17,10 @@ structure TestContext where
 def setup (s : String) : IO TestContext := do
   let flags := SQLITE_OPEN_READWRITE ||| SQLITE_OPEN_CREATE
   let conn ← connect s flags
-  match ← conn.prepare "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, name TEXT NOT NULL);" with
+  match ← conn.prepare "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, name TEXT, height REAL) STRICT;" with
   | Except.ok cursor => cursor.step
   | Except.error _ => pure false
-  match ← conn.prepare "INSERT INTO users (id, name) VALUES (1, 'John Doe');" with
+  match ← conn.prepare "INSERT INTO users (id, name, height) VALUES (1, 'John Doe', 2.3);" with
   | Except.ok cursor => cursor.step
   | Except.error _ => pure false
   return ⟨conn⟩
@@ -43,15 +43,6 @@ def withTest (test : TestContext → IO Bool) : IO Bool := do
     cleanup ctx
     return false
 
-def testInsertData (ctx : TestContext) : IO Bool := do
-  match ← ctx.conn.prepare "INSERT INTO users (id, name) VALUES (?, ?);" with
-  | Except.ok cursor =>
-    cursor.bindInt 1 2
-    cursor.bindText 2 "Jane Doe"
-    let _ ← cursor.step -- This always returns false
-    return true
-  | Except.error _ => return false
-
 def testSelectData (ctx : TestContext) : IO Bool := do
   match ← ctx.conn.prepare "SELECT * FROM users WHERE id = 1;" with
   | Except.ok cursor =>
@@ -59,25 +50,50 @@ def testSelectData (ctx : TestContext) : IO Bool := do
     if hasRow then
       let id ← cursor.columnInt 0
       let name ← cursor.columnText 1
-      return (id = 1 && name == "John Doe")
+      let height ← cursor.columnDouble 2
+      return id == 1 && name == "John Doe" && height == 2.3
     else
       return false
-  | Except.error _ => return false
+  | Except.error err => throw <| .userError err
+
+def testInsertData (ctx : TestContext) : IO Bool := do
+  let id := -2 ^ 63 |>.toInt64
+  let name := "Jane Doe"
+  let height := 20.25
+  match ← ctx.conn.prepare "INSERT INTO users (id, name, height) VALUES (?, ?, ?);" with
+  | Except.ok cursor =>
+    cursor.bindInt64 1 id
+    cursor.bindText 2 name
+    cursor.bindDouble 3 height
+    let _ ← cursor.step -- This always returns false
+  | Except.error err => throw <| .userError err
+  match ← ctx.conn.prepare "SELECT * FROM users WHERE id = ?;" with
+  | Except.ok cursor =>
+    cursor.bindInt64 1 id
+    let hasRow ← cursor.step
+    if hasRow then
+      let id' ← cursor.columnInt64 0
+      let name' ← cursor.columnText 1
+      let height' ← cursor.columnDouble 2
+      return id == id' && name == name' && height == height'
+    else
+      return false
+  | Except.error err => throw <| .userError err
 
 def testParameterBinding (ctx : TestContext) : IO Bool := do
-  match ← ctx.conn.prepare "SELECT * FROM users WHERE id = ? AND name = ?;" with
+  match ← ctx.conn.prepare "SELECT * FROM users WHERE id > ? AND name = ?;" with
   | Except.ok cursor =>
-    cursor.bindInt 1 1
+    cursor.bindInt 1 0
     cursor.bindText 2 "John Doe"
     return true
-  | Except.error _ => return false
+  | Except.error err => throw <| .userError err
 
 def testColumnCount (ctx : TestContext) : IO Bool := do
   match ← ctx.conn.prepare "SELECT * FROM users;" with
   | Except.ok cursor =>
     let count ← cursor.columnsCount
-    return count = 2
-  | Except.error _ => return false
+    return count == 3
+  | Except.error err => throw <| .userError err
 
 def testInvalidSyntax (ctx : TestContext) : IO Bool :=
   return match ← ctx.conn.prepare "INVALID SQL QUERY;" with
@@ -91,8 +107,8 @@ def testNonExistentTable (ctx : TestContext) : IO Bool :=
 
 def main (args : List String) := do
   lspecIO (.ofList [("test suite", [
-    test "can insert data" (← withTest testInsertData),
     test "can select data" (← withTest testSelectData),
+    test "can insert data" (← withTest testInsertData),
     test "can bind parameters" (← withTest testParameterBinding),
     test "can get column count" (← withTest testColumnCount),
     test "handles invalid SQL syntax" (← withTest testInvalidSyntax),
