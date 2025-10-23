@@ -1,21 +1,16 @@
 name: "LSpec CI"
+
 on:
   pull_request:
   push:
     branches:
       - master
+  workflow_dispatch:
+
 jobs:
   build:
-    name: Build
+    name: Tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: cachix/install-nix-action@v22
-        with:
-          nix_path: nixpkgs=channel:nixos-24.11
-      - name: Install Lean
-        run: nix-shell
-      - name: Log versions
-        run: nix-shell --run "lean --version && lake --version"
-      - name: run LSpec binary
-        run: nix-shell --run "lake exe lspec"
+      - uses: actions/checkout@v5
+      - uses: leanprover/lean-action@v1
