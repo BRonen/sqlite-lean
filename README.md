@@ -3,7 +3,7 @@
 ## How to use/build
 1. First, you are going to want to set the enviromental variable CC in order to build this library.
     - Due to a [limitation with leanc](https://github.com/leanprover/lean4/issues/10831), we cannot use the bundled-in version of clang that comes with Lean in order to build this library.
-    - Instead we will have to use a seperate C compiler to build SQLite and then we can use Lean's bundled lld linker to link it with our Lean code.
+    - Instead we will have to use a separate C compiler to build SQLite and then we can use Lean's bundled lld linker to link it with our Lean code.
     - On Windows you can use [w64devkit](https://github.com/skeeto/w64devkit), and then set CC like so
         ```
         $Env:CC = "C:\github\w64devkit\w64devkit\bin\gcc.exe"
