@@ -1,6 +1,5 @@
 #include <lean/lean.h>
 #include <sqlite3.h>
-#include <stdio.h>
 
 lean_external_class* g_sqlite_connection_external_class = NULL;
 lean_external_class* g_sqlite_cursor_external_class = NULL;
