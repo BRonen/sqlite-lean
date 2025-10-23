@@ -67,10 +67,14 @@ structure Cursor where
   step : IO Bool
   bindText : UInt32 → String → IO Unit
   bindInt : UInt32 → Int32 → IO Unit
+  bindInt64 : UInt32 → Int64 → IO Unit
+  bindDouble : UInt32 → Float → IO Unit
   reset : IO Unit
   columnsCount : IO UInt32
   columnText : UInt32 → IO String
   columnInt : UInt32 → IO Int32
+  columnInt64 : UInt32 → IO Int64
+  columnDouble : UInt32 → IO Float
   cursorExplain : UInt32 → IO Int
 
 structure Connection where
@@ -144,10 +148,14 @@ private def sqlitePrepareWrap (conn : RawConn) (query : String) : IO (Except Str
                           step := cursorStep c,
                           bindText := cursorBindText c,
                           bindInt := cursorBindInt c,
+                          bindInt64 := cursorBindInt64 c,
+                          bindDouble := cursorBindDouble c,
                           reset := cursorReset c,
                           columnsCount := cursorColumnsCount c,
                           columnText := cursorColumnText c,
                           columnInt := cursorColumnInt c,
+                          columnInt64 := cursorColumnInt64 c,
+                          columnDouble := cursorColumnDouble c,
                           cursorExplain := cursorExplain c, }
   | Except.error e => Except.error e
 

@@ -36,6 +36,7 @@ lean_exe sqlite where
 
 @[test_driver]
 lean_exe Tests.SQLite where
+  buildType := .debug
   moreLinkObjs := #[libsqlite]
   moreLinkArgs := if !Platform.isWindows then #["-Wl,--unresolved-symbols=ignore-all"] else #[] -- Same as above
 

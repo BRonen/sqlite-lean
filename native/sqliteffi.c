@@ -154,7 +154,6 @@ lean_obj_res lean_sqlite_cursor_column_int(b_lean_obj_arg cursor_box, uint32_t c
 
   const int32_t value = sqlite3_column_int(cursor, col);
 
-  /* TODO: int32's do not need to be boxe */
   return lean_io_result_mk_ok(lean_box(value));
 }
 
@@ -163,7 +162,9 @@ lean_obj_res lean_sqlite_cursor_column_int64(b_lean_obj_arg cursor_box, uint32_t
 
   const int64_t value = sqlite3_column_int64(cursor, col);
 
-  return lean_io_result_mk_ok(lean_box(value));
+  // This is a bit sketchy but it seems to work
+  // There's no lean_box_int64
+  return lean_io_result_mk_ok(lean_box_uint64(value));
 }
 
 lean_obj_res lean_sqlite_cursor_column_double(b_lean_obj_arg cursor_box, uint32_t col) {
@@ -171,7 +172,7 @@ lean_obj_res lean_sqlite_cursor_column_double(b_lean_obj_arg cursor_box, uint32_
 
   const double value = sqlite3_column_double(cursor, col);
 
-  return lean_io_result_mk_ok(lean_box(value));
+  return lean_io_result_mk_ok(lean_box_float(value));
 }
 
 lean_obj_res lean_sqlite_cursor_step(b_lean_obj_arg cursor_box) {
