@@ -41,4 +41,4 @@ lean_exe Tests.SQLite where
   moreLinkArgs := if !Platform.isWindows then #["-Wl,--unresolved-symbols=ignore-all"] else #[] -- Same as above
 
 require LSpec from git
-  "https://github.com/argumentcomputer/lspec/" @ "1fc461a9b83eeb68da34df72cec2ef1994e906cb"
+  "https://github.com/argumentcomputer/lspec/" @ "b05e6b83798bce0887eb5001cb10fdcbe675dde3"
