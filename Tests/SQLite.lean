@@ -9,7 +9,7 @@ instance (b : Bool) : Testable b :=
   if h : b = true then
     .isTrue h
   else
-    .isFalse h s!"Expected true but got false"
+    .isFalse h (msg := s!"Expected true but got false")
 
 structure TestContext where
   conn : Connection
