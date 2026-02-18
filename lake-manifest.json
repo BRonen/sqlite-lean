@@ -5,7 +5,7 @@
    "type": "git",
    "subDir": null,
    "scope": "",
-   "rev": "8e6ddb17c2b7e2bbb63585aa4225c5b0701b8ad2",
+   "rev": "7f5bb9de3aab89c2c24a1c917b17d9b75e6f220e",
    "name": "LSpec",
    "manifestFile": "lake-manifest.json",
    "inputRev": "main",
