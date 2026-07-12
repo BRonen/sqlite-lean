@@ -1,5 +1,8 @@
 # SQLite Lean
 
+> [!WARNING]
+> This library is deprecated. Use the official [SQLite bindings for Lean](https://github.com/leanprover/leansqlite) instead.
+
 ## How to use/build
 1. First, you are going to want to set the enviromental variable CC in order to build this library.
     - Due to a [limitation with leanc](https://github.com/leanprover/lean4/issues/10831), we cannot use the bundled-in version of clang that comes with Lean in order to build this library.
